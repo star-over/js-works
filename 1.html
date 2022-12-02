@@ -1,0 +1,57 @@
+<!-- 1. Измените стиль текста абзаца с помощью кода javascript. -->
+
+
+<html>
+  <script>
+    const getRandomItem = (arr) => {
+      const randomIndex = Math.floor(Math.random() * arr.length)
+      return arr.at(randomIndex)
+    }
+
+    const deleteAllRules = ({sheet}) => {
+      while (sheet.cssRules.length > 0) {
+        sheet.deleteRule(0)
+      }
+    }
+
+    const getStyleEl = () => {
+      let styleEl = document.head.querySelector('style')
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        document.head.appendChild(styleEl);
+      }
+      return styleEl
+    }
+
+    const rules = [
+    "color: red;",
+    "font-weight: 700;",
+    "font-family: sans-serif;",
+    "font-style: italic;",
+    "font-size: 32px;",
+    "text-align: center;",
+    "text-decoration: underline;",
+    "background-color: coral;",
+    ]
+
+    const changeStyle = () => {
+      const styleEl = getStyleEl()
+      const randomRule = getRandomItem(rules)
+      styleEl.sheet.insertRule(`p { ${randomRule} }`)
+    }
+
+    const resetStyle = () => {
+      const styleEl = getStyleEl()
+      deleteAllRules(styleEl)
+    }
+  </script>
+
+  <body>
+    <p id='text'>JavaScript - Хороший язык</p>
+    <div>
+      <button id="btn" onclick="changeStyle()">Стилизовать</button>
+      <button id="btn-clean" onclick="resetStyle()">Сбросить</button>
+    </div>
+  </body>
+
+</html>
