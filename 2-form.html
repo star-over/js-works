@@ -1,0 +1,191 @@
+<!-- 5. Напишите программу на JavaScript для вычисления объема сферы -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    const emptyStore = {
+      operations: [],
+      total: { income: 0, expense: 0, balance: 0 },
+    };
+
+    const saveStore = (store) => {
+      localStorage.accountStore = JSON.stringify(store);
+    };
+
+    const loadStore = () => {
+      if (localStorage.accountStore) {
+        return JSON.parse(localStorage.accountStore);
+      } else {
+        return emptyStore;
+      }
+    };
+
+    const totalIncome = () => loadStore().total.income;
+    const totalExpense = () => loadStore().total.expense;
+    const accountBalance = () => loadStore().total.balance;
+    const accountInfo = () => loadStore().total;
+    const operations = () => loadStore().operations;
+
+    const render = (elements) => {
+      const renderRow = ({ name, family, income, expense }) => {
+        const tableRow = document.createElement('tr');
+        tableRow.innerHTML = `<td>${name}</td><td>${family}</td><td>${income}</td><td>${expense}</td>`;
+        return tableRow;
+      };
+
+      elements.infoIncome.innerText = totalIncome();
+      elements.infoExpense.innerText = totalExpense();
+      elements.infoBalance.innerText = accountBalance();
+      const tableRows = operations().reverse().map((operation) => renderRow(operation));
+      elements.tableBody.replaceChildren(...tableRows);
+      elements.income.value = 0;
+      elements.expense.value = 0;
+
+    };
+
+    const addOperation = (operation) => {
+      const store = loadStore();
+      store.operations.push(operation);
+      store.total.income += operation.income;
+      store.total.expense += operation.expense;
+      store.total.balance += operation.income - operation.expense;
+      saveStore(store);
+    };
+
+    const handleSubmit = (event, elements) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const operation = Object.fromEntries(formData.entries())
+      operation.income = Number(operation.income);
+      operation.expense = Number(operation.expense);
+      addOperation(operation);
+      render(elements);
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const elements = {
+        form: document.querySelector("#account-form"),
+        name: document.querySelector("#name"),
+        family: document.querySelector("#family"),
+        income: document.querySelector("#income"),
+        expense: document.querySelector("#expense"),
+        tableBody: document.querySelector("#table-body"),
+        infoIncome: document.querySelector("#info-income"),
+        infoExpense: document.querySelector("#info-expense"),
+        infoBalance: document.querySelector("#info-balance"),
+      };
+
+      render(elements);
+
+      elements.form.addEventListener('submit', (event) => handleSubmit(event, elements));
+    });
+  </script>
+  <title>Account</title>
+</head>
+<body class="flex min-h-screen justify-center items-start shadow-2xl">
+  <div class="container max-w-xl py-6 px-8 mt-8 bg-zinc-100 border-zinc-200 border border-2  rounded-2xl">
+    <form id="account-form">
+      <legend class="text-4xl mb-8 text-center font-bold text-zinc-500 cursor-default">Account</legend>
+
+      <!-- name -->
+      <div class="mt-4 flex justify-start items-baseline">
+        <label class=" mr-4 w-32 text-zinc-500 text-right text-lg" for="name">Имя:</label>
+        <input
+          class="h-10 w-full text-xl text-slate-600 placeholder:italic placeholder:text-slate-400/50  bg-white border border-slate-300 hover:border-slate-400/70 rounded-xl py-2  px-4 shadow focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1"
+          id="name"
+          type="text"
+          name="name"
+          minlength="2"
+          value="John"
+          placeholder="Имя"/>
+      </div>
+
+      <!-- family -->
+      <div class="mt-4 flex justify-start items-baseline">
+        <label class="mr-4 w-32 text-zinc-500 text-right text-lg" for="family">Фамилия:</label>
+        <input
+          class="h-10 w-full text-xl text-slate-600  placeholder:italic placeholder:text-slate-400/50  bg-white border border-slate-300 hover:border-slate-400/70 rounded-xl py-2  px-4 shadow focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1"
+          id="family"
+          type="text"
+          minlength="2"
+          defaultValue="0"
+          value="Snow"
+          name="family"
+          placeholder="Фамилия"/>
+      </div>
+
+      <!-- income -->
+      <div class="mt-4 flex justify-start items-baseline">
+        <label class="mr-4 w-32 text-zinc-500 text-right text-lg" for="income">Доход:</label>
+        <input
+          class="h-10 w-full text-xl text-slate-600 placeholder:italic placeholder:text-slate-400/50  bg-white border border-slate-300 hover:border-slate-400/70 rounded-xl py-2  px-4 shadow focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1"
+          id="income"
+          name="income"
+          type="number"
+          value="10"
+          defaultValue="0"
+          min="0"
+          max="99999"
+          placeholder="Доход"/>
+      </div>
+
+      <!-- expense -->
+      <div class="mt-4 flex justify-start items-baseline">
+        <label class="mr-4 w-32 text-zinc-500 text-right text-lg" for="expense">Расход:</label>
+        <input
+          class="h-10 w-full text-xl text-slate-600 placeholder:italic placeholder:text-slate-400/50  bg-white border border-slate-300 hover:border-slate-400/70 rounded-xl py-2  px-4 shadow focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1"
+          id="expense"
+          name="expense"
+          type="number"
+          value="20"
+          min="0"
+          max="99999"
+          placeholder="Расход"/>
+      </div>
+
+      <!-- button -->
+      <button
+        class="mt-8 rounded-xl text-2xl font-semibold leading-10 py-2 px-8 w-full bg-sky-500/80 hover:bg-sky-500 text-white cursor-auto shadow-sm"
+        type="submit">
+        Добавить
+      </button>
+    </form>
+
+    <!-- divider -->
+    <div class="mt-4 border border-b-2 border-slate-200"></div>
+
+    <!-- account info -->
+    <section id="account-info">
+      <h3 class="text-lg text-slate-600 cursor-default	">Сводная информация</h3>
+      <div class="flex gap-4 [&>*]:text-slate-600 cursor-default	" id="account-info-wrapper">
+        <p>Баланс: <strong id="info-balance">100</strong></p>
+        <p>Доходы: <strong id="info-income">100</strong></p>
+        <p>Расходы: <strong id="info-expense">100</strong></p>
+      </div>
+
+      <h3 class="mt-4 text-lg text-slate-600 cursor-default	">Детализация</h3>
+      <div id="account-operations" class="mt-2">
+        <table id="operations-table" class="table-fixed rounded-xl px-2 pb-2 pt-0  bg-white shadow-lg w-full">
+          <thead class="h-8 [&>tr>th]:px-4 bg-zinc-300 text-zinc-500 text-right text-sm ">
+            <tr class="">
+              <th class="rounded-l-lg">Имя</th>
+              <th>Фамилия</th>
+              <th>Доход</th>
+              <th class="rounded-r-lg">Расход</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="text-xs text-right [&>tr>td]:text-zinc-500 [&>tr>td]:px-4 [&>tr:hover]:bg-zinc-100 first:[&>tr>td]:rounded-l-lg last:[&>tr>td]:rounded-r-lg">
+            <tr><td>John</td><td>Snow</td><td>100</td><td>0</td></tr>
+            <tr><td>John</td><td>Snow</td><td>0</td><td>150</td></tr>
+            <tr><td>John</td><td>Snow</td><td>100</td><td>150</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
